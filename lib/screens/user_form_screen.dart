@@ -5,6 +5,8 @@ import 'package:form_app/screens/user_profile_screen.dart';
 import 'package:form_app/widgets/date_picker_field.dart';
 import 'package:provider/provider.dart';
 
+import 'chat_screen.dart';
+
 class UserFormScreen extends StatefulWidget {
   static const routeName = '/user-form';
 
@@ -106,6 +108,12 @@ class _UserFormScreenState extends State<UserFormScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(_isEditMode ? 'Editar Perfil' : 'Crear Cuenta'),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.of(context).pushNamed(ChatScreen.routeName);
+        },
+        child: const Icon(Icons.chat),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),

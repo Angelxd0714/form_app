@@ -20,6 +20,9 @@ dependencies:
   google_generative_ai: ^0.4.7
   markdown_widget: ^2.3.2+8
   flutter_markdown: ^0.7.7+1
+  firebase_core: ^3.1.1
+  firebase_storage: ^12.1.1
+  cloud_firestore: ^5.0.2
 
 dev_dependencies:
   flutter_test:

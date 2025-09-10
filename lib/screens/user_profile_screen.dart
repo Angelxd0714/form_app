@@ -5,6 +5,8 @@ import 'package:form_app/screens/address_list_screen.dart';
 import 'package:form_app/screens/user_form_screen.dart';
 import 'package:provider/provider.dart';
 
+import 'chat_screen.dart';
+
 class UserProfileScreen extends StatefulWidget {
   static const routeName = '/user-profile';
 
@@ -53,6 +55,12 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
             tooltip: 'Editar perfil',
           ),
         ],
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.of(context).pushNamed(ChatScreen.routeName);
+        },
+        child: const Icon(Icons.chat),
       ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())

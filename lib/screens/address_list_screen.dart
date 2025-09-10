@@ -3,6 +3,8 @@ import 'package:form_app/providers/user_provider.dart';
 import 'package:form_app/screens/address_form_screen.dart';
 import 'package:provider/provider.dart';
 
+import 'chat_screen.dart';
+
 class AddressListScreen extends StatelessWidget {
   static const routeName = '/address-list';
 
@@ -66,12 +68,26 @@ class AddressListScreen extends StatelessWidget {
           );
         },
       ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () {
-          Navigator.of(context).pushNamed(AddressFormScreen.routeName);
-        },
-        label: const Text('Agregar nueva dirección'),
-        icon: const Icon(Icons.add),
+      floatingActionButton: Column(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          FloatingActionButton(
+            heroTag: "chat",
+            onPressed: () {
+              Navigator.of(context).pushNamed(ChatScreen.routeName);
+            },
+            child: const Icon(Icons.chat),
+          ),
+          const SizedBox(height: 16),
+          FloatingActionButton.extended(
+            heroTag: "add_address",
+            onPressed: () {
+              Navigator.of(context).pushNamed(AddressFormScreen.routeName);
+            },
+            label: const Text('Agregar nueva dirección'),
+            icon: const Icon(Icons.add),
+          ),
+        ],
       ),
     );
   }

@@ -3,6 +3,8 @@ import 'package:form_app/models/address_model.dart';
 import 'package:form_app/providers/user_provider.dart';
 import 'package:provider/provider.dart';
 
+import 'chat_screen.dart';
+
 class AddressFormScreen extends StatefulWidget {
   static const routeName = '/address-form';
 
@@ -71,6 +73,12 @@ class _AddressFormScreenState extends State<AddressFormScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(_editingAddress != null ? 'Editar Dirección' : 'Nueva Dirección'),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.of(context).pushNamed(ChatScreen.routeName);
+        },
+        child: const Icon(Icons.chat),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
