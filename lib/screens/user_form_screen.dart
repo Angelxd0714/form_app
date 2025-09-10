@@ -116,6 +116,7 @@ class _UserFormScreenState extends State<UserFormScreen> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               TextFormField(
+                key: const Key('nombre_field'),
                 controller: _firstNameController,
                 decoration: const InputDecoration(
                   labelText: 'Nombre',
@@ -133,6 +134,7 @@ class _UserFormScreenState extends State<UserFormScreen> {
               ),
               const SizedBox(height: 16),
               TextFormField(
+                key: const Key('apellido_field'),
                 controller: _lastNameController,
                 decoration: const InputDecoration(
                   labelText: 'Apellido',
@@ -140,7 +142,7 @@ class _UserFormScreenState extends State<UserFormScreen> {
                 ),
                 validator: (value) {
                   if (value == null || value.trim().isEmpty) {
-                    return 'Por favor ingresa tu apellido';
+                    return 'Por favor ingrese su apellido';
                   }
                   if (value.trim().length < 2) {
                     return 'El apellido debe tener al menos 2 caracteres';

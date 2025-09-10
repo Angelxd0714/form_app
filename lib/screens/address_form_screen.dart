@@ -81,18 +81,21 @@ class _AddressFormScreenState extends State<AddressFormScreen> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               TextFormField(
+                key: const Key('street_field'),
                 controller: _streetController,
                 decoration: const InputDecoration(labelText: 'Calle'),
                 validator: (value) => value!.isEmpty ? 'Ingresa una calle' : null,
               ),
               const SizedBox(height: 16),
               TextFormField(
+                key: const Key('city_field'),
                 controller: _cityController,
                 decoration: const InputDecoration(labelText: 'Ciudad'),
                 validator: (value) => value!.isEmpty ? 'Ingresa una ciudad' : null,
               ),
               const SizedBox(height: 16),
               TextFormField(
+                key: const Key('state_field'),
                 controller: _stateController,
                 decoration: const InputDecoration(labelText: 'Estado/Provincia'),
                 validator: (value) =>
@@ -100,6 +103,7 @@ class _AddressFormScreenState extends State<AddressFormScreen> {
               ),
               const SizedBox(height: 16),
               TextFormField(
+                key: const Key('zip_code_field'),
                 controller: _zipCodeController,
                 decoration: const InputDecoration(labelText: 'Código Postal'),
                 validator: (value) =>
