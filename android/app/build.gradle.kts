@@ -41,7 +41,8 @@ android {
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName
-        
+        multiDexEnabled = true
+
         ndk {
             version = "27.0.12077973"
             abiFilters.addAll(listOf("armeabi-v7a", "arm64-v8a", "x86_64"))
