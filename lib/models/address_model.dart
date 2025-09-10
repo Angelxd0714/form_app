@@ -25,11 +25,8 @@ class Address {
     String? id, required this.zipCode,
   }) : id = id ?? const Uuid().v4();
 
-  /// Returns a formatted string for the second line of an address display.
-  /// Example: "Anytown, CA, 12345"
   String get fullAddress {
     final parts = [city, state, zipCode];
-    // Join only non-empty parts, and handle country separately.
     var result = parts.where((part) => part.isNotEmpty).join(', ');
     if (country.isNotEmpty) {
       result += ', $country';

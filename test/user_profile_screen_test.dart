@@ -30,9 +30,7 @@ void main() {
 
       expect(find.byType(CircularProgressIndicator), findsOneWidget);
 
-      // Pump once to process async operations like loadUser.
       await tester.pump(Duration.zero);
-      // Pump again to rebuild the widget tree with the new state.
       await tester.pump();
 
       expect(find.byType(CircularProgressIndicator), findsNothing);
@@ -55,9 +53,7 @@ void main() {
 
       expect(find.byType(CircularProgressIndicator), findsOneWidget);
 
-      // Pump once to clear the async microtask queue (for SharedPreferences).
       await tester.pump(Duration.zero);
-      // Pump again to let the UI rebuild after the data is loaded and setState is called.
       await tester.pump();
 
       expect(find.byType(CircularProgressIndicator), findsNothing);

@@ -12,10 +12,8 @@ import 'package:google_fonts/google_fonts.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  
   final userProvider = UserProvider();
   await userProvider.loadUser();
-  
   runApp(MyApp(userProvider: userProvider));
 }
 

@@ -1,10 +1,4 @@
-// GENERATED CODE - DO NOT MODIFY BY HAND
-
 part of 'address_model.dart';
-
-// **************************************************************************
-// JsonSerializableGenerator
-// **************************************************************************
 
 Address _$AddressFromJson(Map<String, dynamic> json) => Address(
   street: json['street'] as String,

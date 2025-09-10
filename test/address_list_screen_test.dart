@@ -60,11 +60,10 @@ void main() {
       await tester.pumpWidget(createWidgetUnderTest(userProvider));
       await tester.pump();
 
-      // Assert using the new `fullAddress` getter format
       expect(find.text('123 Main St'), findsOneWidget);
-      expect(find.text(address1.fullAddress), findsOneWidget); // "Anytown, CA, 12345, USA"
+      expect(find.text(address1.fullAddress), findsOneWidget);
       expect(find.text('456 Oak Ave'), findsOneWidget);
-      expect(find.text(address2.fullAddress), findsOneWidget); // "Otherville, NY, 67890, USA"
+      expect(find.text(address2.fullAddress), findsOneWidget);
       
       final defaultAddressTile = find.ancestor(
         of: find.text('456 Oak Ave'), 

@@ -37,18 +37,13 @@ class UserProvider with ChangeNotifier {
   }
 
   void addAddress(Address address) {
-    if (_currentUser != null) {
-      final List<Address> updatedAddresses = List.from(_currentUser!.addresses);
-      if (address.isDefault) {
-        for (var i = 0; i < updatedAddresses.length; i++) {
-          if (updatedAddresses[i].isDefault) {
-            updatedAddresses[i] = updatedAddresses[i].copyWith(isDefault: false);
-          }
-        }
-      }
-      updatedAddresses.add(address);
-      saveUser(_currentUser!.copyWith(addresses: updatedAddresses));
+    if (_currentUser == null) return;
+    var updatedAddresses = List<Address>.from(_currentUser!.addresses);
+    if (address.isDefault) {
+      updatedAddresses = updatedAddresses.map((addr) => addr.copyWith(isDefault: false)).toList();
     }
+    updatedAddresses.add(address);
+    saveUser(_currentUser!.copyWith(addresses: updatedAddresses));
   }
 
   void removeAddress(String addressId) {
@@ -59,21 +54,17 @@ class UserProvider with ChangeNotifier {
   }
 
   void updateAddress(Address newAddress) {
-    if (_currentUser != null) {
-      List<Address> updatedAddresses = [];
-      for (var address in _currentUser!.addresses) {
-        if (address.id == newAddress.id) {
-          updatedAddresses.add(newAddress);
-        } else {
-          if (newAddress.isDefault && address.isDefault) {
-            updatedAddresses.add(address.copyWith(isDefault: false));
-          } else {
-            updatedAddresses.add(address);
-          }
-        }
+    if (_currentUser == null) return;
+    final updatedAddresses = _currentUser!.addresses.map((address) {
+      if (address.id == newAddress.id) {
+        return newAddress;
       }
-      saveUser(_currentUser!.copyWith(addresses: updatedAddresses));
-    }
+      if (newAddress.isDefault) {
+        return address.copyWith(isDefault: false);
+      }
+      return address;
+    }).toList();
+    saveUser(_currentUser!.copyWith(addresses: updatedAddresses));
   }
 
   void updateDefaultAddress(Address newDefaultAddress) {
