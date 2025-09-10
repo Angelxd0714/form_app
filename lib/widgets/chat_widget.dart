@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
-import 'package:google_generative_ai/google_generative_ai.dart';
+import 'package:form_app/services/gemini_service.dart';
 
 class ChatWidget extends StatefulWidget {
-  const ChatWidget({super.key});
+  final GeminiService geminiService;
+
+  const ChatWidget({super.key, required this.geminiService});
 
   @override
   State<ChatWidget> createState() => _ChatWidgetState();
@@ -15,17 +17,6 @@ class _ChatWidgetState extends State<ChatWidget> {
   final List<Message> _messages = [];
   bool _loading = false;
 
-  late final GenerativeModel _model;
-  late final ChatSession _chat;
-
-  @override
-  void initState() {
-    super.initState();
-    const apiKey = String.fromEnvironment('API_KEY');
-    _model = GenerativeModel(model: 'gemini-pro', apiKey: apiKey);
-    _chat = _model.startChat();
-  }
-  
   @override
   void dispose() {
     _textController.dispose();
@@ -92,10 +83,7 @@ class _ChatWidgetState extends State<ChatWidget> {
     );
 
     try {
-      final response = await _chat.sendMessage(
-        Content.text(text),
-      );
-      final responseText = response.text;
+      final responseText = await widget.geminiService.sendMessage(text);
 
       setState(() {
         if (responseText != null) {

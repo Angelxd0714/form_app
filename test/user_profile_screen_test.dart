@@ -9,10 +9,8 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
-  // Define the key used in the UserProvider
   const String userKey = 'user_data';
 
-  // Helper function to pump the UserProfileScreen with a UserProvider
   Future<void> pumpUserProfileScreen(WidgetTester tester) async {
     await tester.pumpWidget(
       ChangeNotifierProvider(
@@ -26,26 +24,23 @@ void main() {
 
   group('UserProfileScreen Widget Tests', () {
     testWidgets('Should display message when no user profile exists', (WidgetTester tester) async {
-      // Arrange: Set up mock SharedPreferences with no user data
       SharedPreferences.setMockInitialValues({});
 
-      // Act: Pump the initial widget.
       await pumpUserProfileScreen(tester);
 
-      // Assert: Initially, it should show a loading indicator as the initState future is running.
       expect(find.byType(CircularProgressIndicator), findsOneWidget);
 
-      // Act: Pump the widget again to let the Future in initState complete and the UI to update.
+      // Pump once to process async operations like loadUser.
+      await tester.pump(Duration.zero);
+      // Pump again to rebuild the widget tree with the new state.
       await tester.pump();
 
-      // Assert: After loading, it should show the 'no user' message and no loading indicator.
       expect(find.byType(CircularProgressIndicator), findsNothing);
       expect(find.text('No hay información de usuario'), findsOneWidget);
       expect(find.widgetWithText(ElevatedButton, 'Crear Perfil'), findsOneWidget);
     });
 
     testWidgets('Should display user information when a profile exists', (WidgetTester tester) async {
-      // Arrange: Create a test user and set up mock SharedPreferences.
       final testUser = User(
         id: '1',
         firstName: 'Jane',
@@ -56,16 +51,15 @@ void main() {
       final userData = json.encode(testUser.toJson());
       SharedPreferences.setMockInitialValues({userKey: userData});
 
-      // Act: Pump the initial widget.
       await pumpUserProfileScreen(tester);
 
-      // Assert: Initially, a loading indicator should be visible.
       expect(find.byType(CircularProgressIndicator), findsOneWidget);
 
-      // Act: Pump the widget again to process the completion of the `loadUser` Future.
+      // Pump once to clear the async microtask queue (for SharedPreferences).
+      await tester.pump(Duration.zero);
+      // Pump again to let the UI rebuild after the data is loaded and setState is called.
       await tester.pump();
 
-      // Assert: After loading, it should display the user's data and no loading indicator.
       expect(find.byType(CircularProgressIndicator), findsNothing);
       expect(find.text('No hay información de usuario'), findsNothing);
       expect(find.text('Jane'), findsOneWidget);
