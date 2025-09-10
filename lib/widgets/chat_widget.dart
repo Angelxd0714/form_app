@@ -21,7 +21,6 @@ class _ChatWidgetState extends State<ChatWidget> {
   @override
   void initState() {
     super.initState();
-    // Access your API key as an environment variable (see "Set up your API key" section below)
     const apiKey = String.fromEnvironment('API_KEY');
     _model = GenerativeModel(model: 'gemini-pro', apiKey: apiKey);
     _chat = _model.startChat();
