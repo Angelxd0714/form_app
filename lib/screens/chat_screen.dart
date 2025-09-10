@@ -2,7 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:form_app/services/gemini_service.dart';
 import 'package:form_app/widgets/chat_widget.dart';
 import 'package:google_generative_ai/google_generative_ai.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
+await dotenv.load();
+final apiKey = dotenv.env['API_KEY']!;
 class ChatScreen extends StatefulWidget {
   static const routeName = '/chat';
 
@@ -20,7 +23,7 @@ class _ChatScreenState extends State<ChatScreen> {
     super.initState();
     // WARNING: This is not a secure way to store API keys.
     // Please use a secure method like a secret manager for production apps.
-    const apiKey = String.fromEnvironment('API_KEY');
+    const apiKey = apiKey
     if (apiKey.isEmpty) {
       throw Exception('API_KEY environment variable not set.');
     }
