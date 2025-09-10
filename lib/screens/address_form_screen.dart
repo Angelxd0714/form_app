@@ -48,7 +48,7 @@ class _AddressFormScreenState extends State<AddressFormScreen> {
     if (!_formKey.currentState!.validate()) return;
 
     final newAddress = Address(
-      id: _editingAddress?.id, // Keep the same id when editing
+      id: _editingAddress?.id, 
       street: _streetController.text.trim(),
       city: _cityController.text.trim(),
       state: _stateController.text.trim(),

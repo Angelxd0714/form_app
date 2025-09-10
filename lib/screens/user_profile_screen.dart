@@ -19,7 +19,7 @@ class UserProfileScreen extends StatelessWidget {
           IconButton(
             icon: const Icon(Icons.edit),
             onPressed: () {
-              Navigator.of(context).pushNamed(UserFormScreen.routeName);
+              Navigator.of(context).pushNamed(UserFormScreen.routeName, arguments: true);
             },
             tooltip: 'Editar perfil',
           ),
@@ -165,17 +165,16 @@ class UserProfileScreen extends StatelessWidget {
             label: 'Perfil',
           ),
         ],
-        currentIndex: 2, // Perfil
+        currentIndex: 2, 
         onTap: (index) {
           switch (index) {
             case 0:
-              Navigator.of(context).pushNamed(UserFormScreen.routeName, arguments: null);
+              Navigator.of(context).pushNamed(UserFormScreen.routeName, arguments: true);
               break;
             case 1:
               Navigator.of(context).pushNamed(AddressListScreen.routeName);
               break;
             case 2:
-              // Ya estamos en la pantalla de perfil
               break;
           }
         },

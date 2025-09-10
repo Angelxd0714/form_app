@@ -40,7 +40,6 @@ class UserProvider with ChangeNotifier {
     if (_currentUser != null) {
       final List<Address> updatedAddresses = List.from(_currentUser!.addresses);
       if (address.isDefault) {
-        // Unset other default addresses
         for (var i = 0; i < updatedAddresses.length; i++) {
           if (updatedAddresses[i].isDefault) {
             updatedAddresses[i] = updatedAddresses[i].copyWith(isDefault: false);

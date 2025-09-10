@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:form_app/providers/user_provider.dart';
 import 'package:form_app/screens/address_form_screen.dart';
 import 'package:form_app/screens/address_list_screen.dart';
+import 'package:form_app/screens/chat_screen.dart';
+import 'package:form_app/screens/home_screen.dart';
 import 'package:form_app/screens/user_form_screen.dart';
 import 'package:form_app/screens/user_profile_screen.dart';
 import 'package:provider/provider.dart';
@@ -11,7 +13,6 @@ import 'package:google_fonts/google_fonts.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   
-  // Initialize providers and load initial data
   final userProvider = UserProvider();
   await userProvider.loadUser();
   
@@ -113,12 +114,14 @@ class MyApp extends StatelessWidget {
           Locale('en', 'US'),
         ],
         locale: const Locale('es', 'ES'),
-        initialRoute: UserProfileScreen.routeName,
+        initialRoute: HomeScreen.routeName,
         routes: {
+          HomeScreen.routeName: (ctx) => const HomeScreen(),
           UserFormScreen.routeName: (ctx) => const UserFormScreen(),
           UserProfileScreen.routeName: (ctx) => const UserProfileScreen(),
           AddressFormScreen.routeName: (ctx) => const AddressFormScreen(),
           AddressListScreen.routeName: (ctx) => const AddressListScreen(),
+          ChatScreen.routeName: (ctx) => const ChatScreen(),
         },
       ),
     );
