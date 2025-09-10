@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:form_app/models/user_model.dart';
 import 'package:form_app/providers/user_provider.dart';
-import 'package:form_app/screens/address_form_screen.dart';
+import 'package:form_app/screens/user_profile_screen.dart';
 import 'package:form_app/widgets/date_picker_field.dart';
 import 'package:provider/provider.dart';
 
@@ -19,6 +19,23 @@ class _UserFormScreenState extends State<UserFormScreen> {
   final _firstNameController = TextEditingController();
   final _lastNameController = TextEditingController();
   DateTime? _selectedDate;
+  bool _isEditMode = false;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final isEditMode = ModalRoute.of(context)!.settings.arguments as bool? ?? false;
+    if (isEditMode) {
+      final userProvider = Provider.of<UserProvider>(context, listen: false);
+      if (userProvider.hasUser) {
+        final user = userProvider.currentUser!;
+        _isEditMode = true;
+        _firstNameController.text = user.firstName;
+        _lastNameController.text = user.lastName;
+        _selectedDate = user.dateOfBirth;
+      }
+    }
+  }
 
   @override
   void dispose() {
@@ -30,7 +47,7 @@ class _UserFormScreenState extends State<UserFormScreen> {
   Future<void> _selectDate(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
       context: context,
-      initialDate: DateTime.now(),
+      initialDate: _selectedDate ?? DateTime.now(),
       firstDate: DateTime(1900),
       lastDate: DateTime.now(),
     );
@@ -42,22 +59,45 @@ class _UserFormScreenState extends State<UserFormScreen> {
   }
 
   void _submitForm() {
-    if (!_formKey.currentState!.validate()) return;
-    if (_selectedDate == null) {
+    if (!_formKey.currentState!.validate()) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Por favor selecciona tu fecha de nacimiento')),
+        const SnackBar(
+          content: Text('Por favor corrige los errores antes de continuar'),
+          backgroundColor: Colors.red,
+        ),
       );
       return;
     }
 
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+
     final user = User(
+      id: _isEditMode ? userProvider.currentUser!.id : null,
       firstName: _firstNameController.text.trim(),
       lastName: _lastNameController.text.trim(),
       dateOfBirth: _selectedDate!,
+      addresses: _isEditMode ? userProvider.currentUser!.addresses : [],
     );
 
-    Provider.of<UserProvider>(context, listen: false).saveUser(user).then((_) {
-      Navigator.of(context).pushReplacementNamed(AddressFormScreen.routeName);
+    userProvider.saveUser(user).then((_) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            _isEditMode
+                ? 'Perfil actualizado exitosamente'
+                : 'Perfil creado exitosamente',
+          ),
+          backgroundColor: Colors.green,
+        ),
+      );
+      Navigator.of(context).pushReplacementNamed(UserProfileScreen.routeName);
+    }).catchError((error) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Ocurrió un error al guardar el perfil: $error'),
+          backgroundColor: Colors.red,
+        ),
+      );
     });
   }
 
@@ -65,12 +105,13 @@ class _UserFormScreenState extends State<UserFormScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Registro de Usuario'),
+        title: Text(_isEditMode ? 'Editar Perfil' : 'Crear Cuenta'),
       ),
-      body: Padding(
+      body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Form(
           key: _formKey,
+          autovalidateMode: AutovalidateMode.onUserInteraction,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
@@ -78,11 +119,14 @@ class _UserFormScreenState extends State<UserFormScreen> {
                 controller: _firstNameController,
                 decoration: const InputDecoration(
                   labelText: 'Nombre',
-                  border: OutlineInputBorder(),
+                  hintText: 'Ingresa tu nombre',
                 ),
                 validator: (value) {
-                  if (value == null || value.isEmpty) {
+                  if (value == null || value.trim().isEmpty) {
                     return 'Por favor ingresa tu nombre';
+                  }
+                  if (value.trim().length < 2) {
+                    return 'El nombre debe tener al menos 2 caracteres';
                   }
                   return null;
                 },
@@ -92,11 +136,14 @@ class _UserFormScreenState extends State<UserFormScreen> {
                 controller: _lastNameController,
                 decoration: const InputDecoration(
                   labelText: 'Apellido',
-                  border: OutlineInputBorder(),
+                  hintText: 'Ingresa tu apellido',
                 ),
                 validator: (value) {
-                  if (value == null || value.isEmpty) {
+                  if (value == null || value.trim().isEmpty) {
                     return 'Por favor ingresa tu apellido';
+                  }
+                  if (value.trim().length < 2) {
+                    return 'El apellido debe tener al menos 2 caracteres';
                   }
                   return null;
                 },
@@ -113,13 +160,10 @@ class _UserFormScreenState extends State<UserFormScreen> {
                   return null;
                 },
               ),
-              const Spacer(),
+              const SizedBox(height: 32),
               ElevatedButton(
                 onPressed: _submitForm,
-                style: ElevatedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                ),
-                child: const Text('Siguiente'),
+                child: Text(_isEditMode ? 'Guardar Cambios' : 'Registrarse'),
               ),
             ],
           ),

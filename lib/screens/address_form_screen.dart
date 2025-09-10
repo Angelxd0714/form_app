@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:form_app/models/address_model.dart';
 import 'package:form_app/providers/user_provider.dart';
-import 'package:form_app/screens/user_profile_screen.dart';
-import 'package:form_app/widgets/country_state_city_picker.dart';
 import 'package:provider/provider.dart';
 
 class AddressFormScreen extends StatefulWidget {
@@ -17,95 +15,99 @@ class AddressFormScreen extends StatefulWidget {
 class _AddressFormScreenState extends State<AddressFormScreen> {
   final _formKey = GlobalKey<FormState>();
   final _streetController = TextEditingController();
-  final _additionalInfoController = TextEditingController();
-  String? _selectedCountry;
-  String? _selectedState;
-  String? _selectedCity;
+  final _cityController = TextEditingController();
+  final _stateController = TextEditingController();
+  final _zipCodeController = TextEditingController();
   bool _isDefault = false;
+  Address? _editingAddress;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final address = ModalRoute.of(context)!.settings.arguments as Address?;
+    if (address != null) {
+      _editingAddress = address;
+      _streetController.text = address.street;
+      _cityController.text = address.city;
+      _stateController.text = address.state;
+      _zipCodeController.text = address.zipCode;
+      _isDefault = address.isDefault;
+    }
+  }
 
   @override
   void dispose() {
     _streetController.dispose();
-    _additionalInfoController.dispose();
+    _cityController.dispose();
+    _stateController.dispose();
+    _zipCodeController.dispose();
     super.dispose();
   }
 
   void _submitForm() {
     if (!_formKey.currentState!.validate()) return;
-    if (_selectedCountry == null || _selectedState == null || _selectedCity == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Por favor completa toda la información de ubicación')),
-      );
-      return;
-    }
 
-    final address = Address(
+    final newAddress = Address(
+      id: _editingAddress?.id, // Keep the same id when editing
       street: _streetController.text.trim(),
-      city: _selectedCity!,
-      state: _selectedState!,
-      country: _selectedCountry!,
-      additionalInfo: _additionalInfoController.text.trim().isNotEmpty
-          ? _additionalInfoController.text.trim()
-          : null,
-      isDefault: _isDefault,
+      city: _cityController.text.trim(),
+      state: _stateController.text.trim(),
+      zipCode: _zipCodeController.text.trim(),
+      isDefault: _isDefault, country: '',
     );
 
-    Provider.of<UserProvider>(context, listen: false)
-        .addAddress(address)
-        .then((_) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Dirección guardada exitosamente')),
-      );
-      Navigator.of(context).pushReplacementNamed(UserProfileScreen.routeName);
-    });
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+    if (_editingAddress != null) {
+      userProvider.updateAddress(newAddress);
+    } else {
+      userProvider.addAddress(newAddress);
+    }
+
+    Navigator.of(context).pop();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Agregar Dirección'),
+        title: Text(_editingAddress != null ? 'Editar Dirección' : 'Nueva Dirección'),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Form(
           key: _formKey,
+          autovalidateMode: AutovalidateMode.onUserInteraction,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              CountryStateCityPicker(
-                onCountryChanged: (value) => _selectedCountry = value,
-                onStateChanged: (value) => _selectedState = value,
-                onCityChanged: (value) => _selectedCity = value,
-              ),
-              const SizedBox(height: 16),
               TextFormField(
                 controller: _streetController,
-                decoration: const InputDecoration(
-                  labelText: 'Calle y Número',
-                  hintText: 'Ej: Av. Principal #123',
-                  border: OutlineInputBorder(),
-                ),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Por favor ingresa la calle y número';
-                  }
-                  return null;
-                },
+                decoration: const InputDecoration(labelText: 'Calle'),
+                validator: (value) => value!.isEmpty ? 'Ingresa una calle' : null,
               ),
               const SizedBox(height: 16),
               TextFormField(
-                controller: _additionalInfoController,
-                decoration: const InputDecoration(
-                  labelText: 'Información Adicional (Opcional)',
-                  hintText: 'Ej: Edificio, Piso, Depto, etc.',
-                  border: OutlineInputBorder(),
-                ),
-                maxLines: 2,
+                controller: _cityController,
+                decoration: const InputDecoration(labelText: 'Ciudad'),
+                validator: (value) => value!.isEmpty ? 'Ingresa una ciudad' : null,
+              ),
+              const SizedBox(height: 16),
+              TextFormField(
+                controller: _stateController,
+                decoration: const InputDecoration(labelText: 'Estado/Provincia'),
+                validator: (value) =>
+                    value!.isEmpty ? 'Ingresa un estado o provincia' : null,
+              ),
+              const SizedBox(height: 16),
+              TextFormField(
+                controller: _zipCodeController,
+                decoration: const InputDecoration(labelText: 'Código Postal'),
+                validator: (value) =>
+                    value!.isEmpty ? 'Ingresa un código postal' : null,
               ),
               const SizedBox(height: 16),
               SwitchListTile(
-                title: const Text('Establecer como dirección principal'),
+                title: const Text('Marcar como dirección principal'),
                 value: _isDefault,
                 onChanged: (value) {
                   setState(() {
@@ -113,22 +115,10 @@ class _AddressFormScreenState extends State<AddressFormScreen> {
                   });
                 },
               ),
-              const SizedBox(height: 24),
+              const SizedBox(height: 32),
               ElevatedButton(
                 onPressed: _submitForm,
-                style: ElevatedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                ),
                 child: const Text('Guardar Dirección'),
-              ),
-              const SizedBox(height: 12),
-              TextButton(
-                onPressed: () {
-                  Navigator.of(context).pushReplacementNamed(
-                    UserProfileScreen.routeName,
-                  );
-                },
-                child: const Text('Omitir por ahora'),
               ),
             ],
           ),

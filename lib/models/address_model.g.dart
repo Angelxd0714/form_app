@@ -14,6 +14,7 @@ Address _$AddressFromJson(Map<String, dynamic> json) => Address(
   additionalInfo: json['additionalInfo'] as String?,
   isDefault: json['isDefault'] as bool? ?? false,
   id: json['id'] as String?,
+  zipCode: json['zipCode'] as String,
 );
 
 Map<String, dynamic> _$AddressToJson(Address instance) => <String, dynamic>{
@@ -24,4 +25,5 @@ Map<String, dynamic> _$AddressToJson(Address instance) => <String, dynamic>{
   'country': instance.country,
   'additionalInfo': instance.additionalInfo,
   'isDefault': instance.isDefault,
+  'zipCode': instance.zipCode,
 };

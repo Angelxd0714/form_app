@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:form_app/providers/user_provider.dart';
-import 'package:form_app/screens/address_form_screen.dart';
+import 'package:form_app/screens/address_list_screen.dart';
 import 'package:form_app/screens/user_form_screen.dart';
 import 'package:provider/provider.dart';
 
@@ -14,20 +14,22 @@ class UserProfileScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Mi Perfil'),
+        title: const Text('Perfil'),
         actions: [
           IconButton(
-            icon: const Icon(Icons.add_location_alt),
+            icon: const Icon(Icons.edit),
             onPressed: () {
-              Navigator.of(context).pushNamed(AddressFormScreen.routeName);
+              Navigator.of(context).pushNamed(UserFormScreen.routeName);
             },
-            tooltip: 'Agregar dirección',
+            tooltip: 'Editar perfil',
           ),
         ],
       ),
       body: Consumer<UserProvider>(
         builder: (context, userProvider, _) {
-          if (!userProvider.hasUser) {
+          if (userProvider.currentUser == null) {
+            return const Center(child: CircularProgressIndicator());
+          } else if (!userProvider.hasUser) {
             return Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -71,8 +73,13 @@ class UserProfileScreen extends StatelessWidget {
                         const Divider(),
                         ListTile(
                           leading: const Icon(Icons.person),
-                          title: const Text('Nombre Completo'),
-                          subtitle: Text(user.fullName),
+                          title: const Text('Nombre'),
+                          subtitle: Text(user.firstName),
+                        ),
+                        ListTile(
+                          leading: const Icon(Icons.person_outline),
+                          title: const Text('Apellido'),
+                          subtitle: Text(user.lastName),
                         ),
                         ListTile(
                           leading: const Icon(Icons.cake),
@@ -88,7 +95,7 @@ class UserProfileScreen extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     const Text(
-                      'Mis Direcciones',
+                      'Direcciones',
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
@@ -97,10 +104,10 @@ class UserProfileScreen extends StatelessWidget {
                     TextButton(
                       onPressed: () {
                         Navigator.of(context).pushNamed(
-                          AddressFormScreen.routeName,
+                          AddressListScreen.routeName,
                         );
                       },
-                      child: const Text('AGREGAR'),
+                      child: const Text('Añadir nueva'),
                     ),
                   ],
                 ),
@@ -123,18 +130,17 @@ class UserProfileScreen extends StatelessWidget {
                         child: ListTile(
                           leading: const Icon(Icons.location_on),
                           title: Text(
-                            address.fullAddress,
+                            address.street,
                             style: const TextStyle(fontWeight: FontWeight.w500),
                           ),
-                          subtitle: address.isDefault
-                              ? const Text('Dirección principal')
+                          subtitle: Text(address.fullAddress),
+                          trailing: address.isDefault
+                              ? const Chip(
+                                  label: Text('Primaria'),
+                                  backgroundColor: Colors.green,
+                                  labelStyle: TextStyle(color: Colors.white),
+                                )
                               : null,
-                          trailing: IconButton(
-                            icon: const Icon(Icons.delete, color: Colors.red),
-                            onPressed: () {
-                              _showDeleteDialog(context, address.id);
-                            },
-                          ),
                         ),
                       );
                     },
@@ -144,32 +150,35 @@ class UserProfileScreen extends StatelessWidget {
           );
         },
       ),
-    );
-  }
-
-  void _showDeleteDialog(BuildContext context, String addressId) {
-    showDialog(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('Eliminar Dirección'),
-        content: const Text('¿Estás seguro de que quieres eliminar esta dirección?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(),
-            child: const Text('Cancelar'),
+      bottomNavigationBar: BottomNavigationBar(
+        items: const <BottomNavigationBarItem>[
+          BottomNavigationBarItem(
+            icon: Icon(Icons.app_registration),
+            label: 'Registro',
           ),
-          TextButton(
-            onPressed: () {
-              Navigator.of(ctx).pop();
-              Provider.of<UserProvider>(context, listen: false)
-                  .removeAddress(addressId);
-            },
-            child: const Text(
-              'Eliminar',
-              style: TextStyle(color: Colors.red),
-            ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.location_on_outlined),
+            label: 'Direcciones',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.person_outline),
+            label: 'Perfil',
           ),
         ],
+        currentIndex: 2, // Perfil
+        onTap: (index) {
+          switch (index) {
+            case 0:
+              Navigator.of(context).pushNamed(UserFormScreen.routeName, arguments: null);
+              break;
+            case 1:
+              Navigator.of(context).pushNamed(AddressListScreen.routeName);
+              break;
+            case 2:
+              // Ya estamos en la pantalla de perfil
+              break;
+          }
+        },
       ),
     );
   }

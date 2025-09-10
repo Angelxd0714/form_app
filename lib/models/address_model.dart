@@ -13,6 +13,8 @@ class Address {
   final String? additionalInfo;
   final bool isDefault;
 
+  String zipCode;
+
   Address({
     required this.street,
     required this.city,
@@ -20,7 +22,7 @@ class Address {
     required this.country,
     this.additionalInfo,
     this.isDefault = false,
-    String? id,
+    String? id, required this.zipCode,
   }) : id = id ?? const Uuid().v4();
 
   String get fullAddress {
@@ -35,4 +37,26 @@ class Address {
 
   factory Address.fromJson(Map<String, dynamic> json) => _$AddressFromJson(json);
   Map<String, dynamic> toJson() => _$AddressToJson(this);
+
+  Address copyWith({
+    String? id,
+    String? street,
+    String? city,
+    String? state,
+    String? country,
+    String? zipCode,
+    String? additionalInfo,
+    bool? isDefault,
+  }) {
+    return Address(
+      id: id ?? this.id,
+      street: street ?? this.street,
+      city: city ?? this.city,
+      state: state ?? this.state,
+      country: country ?? this.country,
+      zipCode: zipCode ?? this.zipCode,
+      additionalInfo: additionalInfo ?? this.additionalInfo,
+      isDefault: isDefault ?? this.isDefault,
+    );
+  }
 }
